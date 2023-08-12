@@ -10,6 +10,8 @@
 
 #define MOD Mod4Mask
 
+#define WORKSPACE_COUNT 10
+
 #define BORDER_WIDTH 3
 #define BORDER_NORMAL "#7a8478"
 #define BORDER_SELECT "#d3c6aa"
@@ -78,6 +80,12 @@ struct key keys[] = {
     {MOD, XK_F3, run, {.com = bridown}},
 
     // workspace switching
+    {MOD, XK_a, ws_prev, {0}},
+    {MOD|ShiftMask, XK_a, win_to_prev_ws, {0}},
+
+    {MOD, XK_d, ws_next, {0}},
+    {MOD|ShiftMask, XK_d, win_to_next_ws, {0}},
+
     {MOD,           XK_1, ws_go,     {.i = 1}},
     {MOD|ShiftMask, XK_1, win_to_ws, {.i = 1}},
 

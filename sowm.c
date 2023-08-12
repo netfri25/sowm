@@ -10,7 +10,7 @@
 
 #include "config.h"
 
-static client       *list = {0}, *ws_list[10] = {0}, *cur;
+static client       *list = {0}, *ws_list[WORKSPACE_COUNT] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
 
@@ -274,6 +274,44 @@ void ws_go(const Arg arg) {
     ws_sel(arg.i);
 
     if (list) win_focus(list); else cur = 0;
+}
+
+static int prev_workspace(void) {
+    int new_ws = ws - 1;
+    // wrap around
+    if (new_ws <= 0) new_ws = WORKSPACE_COUNT - 1;
+    return new_ws;
+}
+
+static int next_workspace(void) {
+    int new_ws = ws + 1;
+    // wrap around
+    if (new_ws >= WORKSPACE_COUNT) new_ws = 1;
+    return new_ws;
+}
+
+void ws_prev(const Arg arg) {
+    (void) arg;
+    ws_go((const Arg){.i = prev_workspace()});
+}
+
+void ws_next(const Arg arg) {
+    (void) arg;
+    ws_go((const Arg){.i = next_workspace()});
+}
+
+void win_to_prev_ws(const Arg arg) {
+    (void) arg;
+    const Arg new_ws = {.i = prev_workspace()};
+    win_to_ws(new_ws);
+    ws_go(new_ws);
+}
+
+void win_to_next_ws(const Arg arg) {
+    (void) arg;
+    const Arg new_ws = {.i = next_workspace()};
+    win_to_ws(new_ws);
+    ws_go(new_ws);
 }
 
 void configure_request(XEvent *e) {

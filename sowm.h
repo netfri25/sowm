@@ -60,5 +60,9 @@ void win_next(const Arg arg);
 void win_snap(const Arg arg);
 void win_to_ws(const Arg arg);
 void ws_go(const Arg arg);
+void ws_prev(const Arg arg);
+void ws_next(const Arg arg);
+void win_to_prev_ws(const Arg arg);
+void win_to_next_ws(const Arg arg);
 
 static int xerror() { return 0; }
