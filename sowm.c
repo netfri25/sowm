@@ -8,12 +8,13 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include "sowm.h"
+#include "config.h"
 
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
 
+static int          s;
 static Display      *d;
 static XButtonEvent mouse;
 static Window       root;
@@ -30,12 +31,28 @@ static void (*events[LASTEvent])(XEvent *e) = {
     [MotionNotify]     = notify_motion
 };
 
-#include "config.h"
+unsigned long getcolor(const char *col) {
+    Colormap m = DefaultColormap(d, s);
+    XColor c;
+    return (!XAllocNamedColor(d, m, col, &c, &c))?0:c.pixel;
+}
+
 
 void win_focus(client *c) {
+    if (cur) XSetWindowBorder(d, cur->w, getcolor(BORDER_NORMAL));
     cur = c;
+
+    XSetWindowBorder(d, cur->w, getcolor(BORDER_SELECT));
+
+    if (cur->fs) {
+        XConfigureWindow(d, cur->w, CWBorderWidth, &(XWindowChanges){.border_width = 0});
+    } else {
+        XConfigureWindow(d, cur->w, CWBorderWidth, &(XWindowChanges){.border_width = BORDER_WIDTH});
+    }
     XSetInputFocus(d, cur->w, RevertToParent, CurrentTime);
 }
+
+
 
 void notify_destroy(XEvent *e) {
     win_del(e->xdestroywindow.window);
@@ -45,6 +62,7 @@ void notify_destroy(XEvent *e) {
 
 void notify_enter(XEvent *e) {
     while(XCheckTypedEvent(d, EnterNotify, e));
+    while(XCheckTypedWindowEvent(d, mouse.subwindow, MotionNotify, e));
 
     for win if (c->w == e->xcrossing.window) win_focus(c);
 }
@@ -105,6 +123,7 @@ void win_add(Window w) {
     }
 
     ws_save(ws);
+    win_focus(c);
 }
 
 void win_del(Window w) {
@@ -139,9 +158,71 @@ void win_fs(const Arg arg) {
     if ((cur->f = cur->f ? 0 : 1)) {
         win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
         XMoveResizeWindow(d, cur->w, 0, 0, sw, sh);
-
+        cur->fs = 1;
+        win_focus(cur);
     } else {
         XMoveResizeWindow(d, cur->w, cur->wx, cur->wy, cur->ww, cur->wh);
+        cur->fs = 0;
+        win_focus(cur);
+    }
+}
+
+void win_maximize(const Arg arg) {
+    if (!cur) return;
+
+    win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
+    XMoveResizeWindow(d, cur->w, gappx, gappx, sw - 2 * gappx, sh - 2 *gappx);
+}
+
+void win_snap(const Arg arg) {
+    if (!cur) return;
+
+    win_size(cur->w, &wx, &wy, &ww, &wh);
+    int x, y;
+    unsigned int w, h;
+
+    switch (arg.i) {
+        case 1:
+            x = wx;
+            y = wy;
+            w = ww;
+            h = (splitrat * wh) - (gappx / 2);
+            break;
+        case 2:
+            x = wx + (splitrat * ww) + (gappx / 2);
+            y = wy;
+            w = ((1 - splitrat) * ww) - (gappx / 2);
+            h = wh;
+            break;
+        case 3:
+            x = wx;
+            y = wy + (splitrat * wh) + (gappx / 2);
+            w = ww;
+            h = ((1 - splitrat) * wh) - (gappx / 2);
+            break;
+        case 4:
+            x = wx;
+            y = wy;
+            w = (splitrat * ww) - (gappx / 2);
+            h = wh;
+            break;
+        default:
+            x = wx;
+            y = wy;
+            w = ww;
+            h = wh;
+            break;
+    }
+
+    XMoveResizeWindow(d, cur->w, x, y, w, h);
+}
+
+void modify_splitr(const Arg arg) {
+    if (arg.i == 1) {
+        splitrat += 0.1;
+    }
+    if (arg.i == 2) {
+        splitrat -= 0.1;
     }
 }
 
@@ -237,6 +318,14 @@ void run(const Arg arg) {
 
     setsid();
     execvp((char*)arg.com[0], (char**)arg.com);
+}
+
+void run_raw(const Arg arg) {
+    if (fork()) return;
+    if (d) close(ConnectionNumber(d));
+
+    setsid();
+    (void)! system(arg.com[0]);
 }
 
 void input_grab(Window root) {

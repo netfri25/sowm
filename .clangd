@@ -1,0 +1,4 @@
+CompileFlags:
+  Add:
+    - "--include-path=/usr/include/freetype2"
+    - "-Wno-strict-prototypes"

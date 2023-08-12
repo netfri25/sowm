@@ -1,0 +1,178 @@
+From 564fe3ca64785de96214c3121ea4a68dce6a520d Mon Sep 17 00:00:00 2001
+From: Serene Void <ajuph9224@gmail.com>
+Date: Sat, 4 Mar 2023 10:21:25 +0530
+Subject: [PATCH 1/2] patch: pseudo-tiling + gaps
+
+---
+ config.def.h | 10 +++++++++
+ sowm.c       | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ sowm.h       |  3 +++
+ 3 files changed, 72 insertions(+)
+
+diff --git a/config.def.h b/config.def.h
+index cae2009..4181578 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -3,6 +3,9 @@
+ 
+ #define MOD Mod4Mask
+ 
++static const unsigned int gappx          = 8;       /* gap pixel */
++static float splitrat                    = 0.6;     /* split ratio */
++
+ const char* menu[]    = {"dmenu_run",      0};
+ const char* term[]    = {"st",             0};
+ const char* scrot[]   = {"scr",            0};
+@@ -17,6 +20,13 @@ static struct key keys[] = {
+     {MOD,      XK_q,   win_kill,   {0}},
+     {MOD,      XK_c,   win_center, {0}},
+     {MOD,      XK_f,   win_fs,     {0}},
++    {MOD,                XK_m,                     win_maximize,    {0}},
++    {MOD,                XK_k,                     win_snap,        {.i = 1}},
++    {MOD,                XK_l,                     win_snap,        {.i = 2}},
++    {MOD,                XK_j,                     win_snap,        {.i = 3}},
++    {MOD,                XK_h,                     win_snap,        {.i = 4}},
++    {MOD|ShiftMask,      XK_i,                     modify_splitr,   {.i = 1}},
++    {MOD,                XK_i,                     modify_splitr,   {.i = 2}},
+ 
+     {Mod1Mask,           XK_Tab, win_next,   {0}},
+     {Mod1Mask|ShiftMask, XK_Tab, win_prev,   {0}},
+diff --git a/sowm.c b/sowm.c
+index 96f8340..2da86cf 100644
+--- a/sowm.c
++++ b/sowm.c
+@@ -145,6 +145,65 @@ void win_fs(const Arg arg) {
+     }
+ }
+ 
++void win_maximize(const Arg arg) {
++    if (!cur) return;
++
++    win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
++    XMoveResizeWindow(d, cur->w, gappx, gappx, sw - 2 * gappx, sh - 2 *gappx);
++}
++
++void win_snap(const Arg arg) {
++    if (!cur) return;
++
++    win_size(cur->w, &wx, &wy, &ww, &wh);
++    int x, y;
++    unsigned int w, h;
++
++    switch (arg.i) {
++        case 1:
++            x = wx;
++            y = wy;
++            w = ww;
++            h = (splitrat * wh) - (gappx / 2);
++            break;
++        case 2:
++            x = wx + (splitrat * ww) + (gappx / 2);
++            y = wy;
++            w = ((1 - splitrat) * ww) - (gappx / 2);
++            h = wh;
++            break;
++        case 3:
++            x = wx;
++            y = wy + (splitrat * wh) + (gappx / 2);
++            w = ww;
++            h = ((1 - splitrat) * wh) - (gappx / 2);
++            break;
++        case 4:
++            x = wx;
++            y = wy;
++            w = (splitrat * ww) - (gappx / 2);
++            h = wh;
++            break;
++        default:
++            x = wx;
++            y = wy;
++            w = ww;
++            h = wh;
++            break;
++    }
++
++    XMoveResizeWindow(d, cur->w, x, y, w, h);
++}
++
++void modify_splitr(const Arg arg) {
++    if (arg.i == 1) {
++        splitrat += 0.1;
++    }
++    if (arg.i == 2) {
++        splitrat -= 0.1;
++    }
++}
++
+ void win_to_ws(const Arg arg) {
+     int tmp = ws;
+ 
+diff --git a/sowm.h b/sowm.h
+index b059f06..8ab60aa 100644
+--- a/sowm.h
++++ b/sowm.h
+@@ -40,6 +40,7 @@ void input_grab(Window root);
+ void key_press(XEvent *e);
+ void map_request(XEvent *e);
+ void mapping_notify(XEvent *e);
++void modify_splitr(const Arg arg);
+ void notify_destroy(XEvent *e);
+ void notify_enter(XEvent *e);
+ void notify_motion(XEvent *e);
+@@ -51,7 +52,9 @@ void win_fs(const Arg arg);
+ void win_focus(client *c);
+ void win_kill(const Arg arg);
+ void win_prev(const Arg arg);
++void win_maximize(const Arg arg);
+ void win_next(const Arg arg);
++void win_snap(const Arg arg);
+ void win_to_ws(const Arg arg);
+ void ws_go(const Arg arg);
+ 
+
+From 96304a3a944482ec07821008c0c8af92165d93b0 Mon Sep 17 00:00:00 2001
+From: Serene Void <ajuph9224@gmail.com>
+Date: Mon, 20 Mar 2023 09:42:00 +0530
+Subject: [PATCH 2/2] chore: added autostart and changed config
+
+---
+ sowm.c | 6 ++++++
+ sowm.h | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/sowm.c b/sowm.c
+index 2da86cf..c701642 100644
+--- a/sowm.c
++++ b/sowm.c
+@@ -298,6 +298,11 @@ void run(const Arg arg) {
+     execvp((char*)arg.com[0], (char**)arg.com);
+ }
+ 
++void runAutoStart(void) {
++    system("cd ~/.sowm; ./autostart_blocking.sh");
++    system("cd ~/.sowm; ./autostart.sh &");
++}
++
+ void input_grab(Window root) {
+     unsigned int i, j, modifiers[] = {0, LockMask, numlock, numlock|LockMask};
+     XModifierKeymap *modmap = XGetModifierMapping(d);
+@@ -342,6 +347,7 @@ int main(void) {
+     XSelectInput(d,  root, SubstructureRedirectMask);
+     XDefineCursor(d, root, XCreateFontCursor(d, 68));
+     input_grab(root);
++    runAutoStart();
+ 
+     while (1 && !XNextEvent(d, &ev)) // 1 && will forever be here.
+         if (events[ev.type]) events[ev.type](&ev);
+diff --git a/sowm.h b/sowm.h
+index 8ab60aa..fe245f6 100644
+--- a/sowm.h
++++ b/sowm.h
+@@ -45,6 +45,7 @@ void notify_destroy(XEvent *e);
+ void notify_enter(XEvent *e);
+ void notify_motion(XEvent *e);
+ void run(const Arg arg);
++void runAutoStart(void);
+ void win_add(Window w);
+ void win_center(const Arg arg);
+ void win_del(Window w);
