@@ -156,7 +156,7 @@ void win_center(const Arg arg) {
     if (!cur) return;
 
     win_size(cur->w, &(int){0}, &(int){0}, &ww, &wh);
-    XMoveWindow(d, cur->w, (sw - ww) / 2, (sh - wh) / 2);
+    XMoveWindow(d, cur->w, (sw - ww) / 2 - CENTER_FIX, (sh - wh) / 2 - CENTER_FIX);
 }
 
 void win_fs(const Arg arg) {
@@ -178,7 +178,8 @@ void win_maximize(const Arg arg) {
     if (!cur) return;
 
     win_size(cur->w, &cur->wx, &cur->wy, &cur->ww, &cur->wh);
-    XMoveResizeWindow(d, cur->w, gappx, gappx, sw - 2 * gappx, sh - 2 *gappx);
+    XResizeWindow(d, cur->w, sw - 2 * gappx, sh - 2 * gappx);
+    win_center(arg);
 }
 
 void win_snap(const Arg arg) {

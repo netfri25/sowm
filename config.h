@@ -11,10 +11,12 @@
 #define MOD Mod4Mask
 
 #define WORKSPACE_COUNT 10
+#define CENTER_FIX 3
 
 #define BORDER_WIDTH 3
 #define BORDER_NORMAL "#7a8478"
 #define BORDER_SELECT "#d3c6aa"
+
 
 const unsigned int gappx          = 10;       /* gap pixel */
 float splitrat                    = 0.6;     /* split ratio */
