@@ -5,6 +5,7 @@
 #include <X11/keysym.h>
 #include <X11/XKBlib.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -142,7 +143,13 @@ void win_del(Window w) {
 }
 
 void win_kill(const Arg arg) {
-    if (cur) XKillClient(d, cur->w);
+    XEvent msg = {0};
+    msg.xclient.type = ClientMessage;
+    msg.xclient.message_type =  XInternAtom(d, "WM_PROTOCOLS", false);
+    msg.xclient.window = cur->w;
+    msg.xclient.format = 32;
+    msg.xclient.data.l[0] = XInternAtom(d, "WM_DELETE_WINDOW", false);
+    XSendEvent(d, cur->w, false, 0, &msg);
 }
 
 void win_center(const Arg arg) {
