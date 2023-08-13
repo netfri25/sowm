@@ -37,6 +37,10 @@ const char* colors[]  = {"bud", "/home/goldie/Pictures/Wallpapers", 0};
 
 const char* browser[] = {"firefox", 0};
 
+const char* media_toggle[] = {"playerctl", "play-pause", 0};
+const char* media_prev[]   = {"playerctl", "previous",   0};
+const char* media_next[]   = {"playerctl", "next",       0};
+
 struct key keys[] = {
     {MOD,      XK_q,   win_kill,   {0}},
     {MOD,      XK_c,   win_center, {0}},
@@ -72,6 +76,11 @@ struct key keys[] = {
     // additional volume controls
     {MOD, XK_F2, run, {.com = volup}},
     {MOD, XK_F1, run, {.com = voldown}},
+
+    // media controls
+    {Mod1Mask, XK_F1, run, {.com = media_toggle}},
+    {Mod1Mask, XK_F2, run, {.com = media_prev}},
+    {Mod1Mask, XK_F3, run, {.com = media_next}},
 
     // brightness controls
     {0,   XF86XK_MonBrightnessUp,   run, {.com = briup}},
