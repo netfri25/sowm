@@ -15,6 +15,7 @@ static client       *list = {0}, *ws_list[WORKSPACE_COUNT] = {0}, *cur;
 static int          ws = 1, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
 
+static bool keep_running = true;
 static int          s;
 static Display      *d;
 static XButtonEvent mouse;
@@ -402,6 +403,11 @@ void input_grab(Window root) {
     XFreeModifiermap(modmap);
 }
 
+void stop_running(const Arg arg) {
+    (void) arg;
+    keep_running = false;
+}
+
 int main(void) {
     XEvent ev;
 
@@ -419,6 +425,8 @@ int main(void) {
     XDefineCursor(d, root, XCreateFontCursor(d, 68));
     input_grab(root);
 
-    while (1 && !XNextEvent(d, &ev)) // 1 && will forever be here.
+    while (keep_running && !XNextEvent(d, &ev))
         if (events[ev.type]) events[ev.type](&ev);
+
+    XCloseDisplay(d);
 }

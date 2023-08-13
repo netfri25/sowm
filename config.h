@@ -42,10 +42,13 @@ const char* media_prev[]   = {"playerctl", "previous",   0};
 const char* media_next[]   = {"playerctl", "next",       0};
 
 struct key keys[] = {
-    {MOD,      XK_q,   win_kill,   {0}},
-    {MOD,      XK_c,   win_center, {0}},
-    {MOD,      XK_f,   win_fs,     {0}},
+    // general keys
+    {MOD|ShiftMask, XK_q,   stop_running, {0}},
+    {MOD,           XK_q,   win_kill,     {0}},
+    {MOD,           XK_c,   win_center,   {0}},
+    {MOD,           XK_f,   win_fs,       {0}},
 
+    // window keys
     {Mod1Mask,           XK_Tab, win_next,   {0}},
     {Mod1Mask|ShiftMask, XK_Tab, win_prev,   {0}},
     {MOD,                XK_m, win_maximize,    {0}},
@@ -55,7 +58,6 @@ struct key keys[] = {
     {MOD,                XK_h, win_snap,        {.i = 4}},
     {MOD|ShiftMask,      XK_i, modify_splitr,   {.i = 1}},
     {MOD,                XK_i, modify_splitr,   {.i = 2}},
-
 
     // additional apps
     {MOD, XK_b, run, {.com = browser}},
