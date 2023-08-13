@@ -18,8 +18,8 @@
 #define BORDER_SELECT "#d3c6aa"
 
 
-const unsigned int gappx          = 10;       /* gap pixel */
-float splitrat                    = 0.6;     /* split ratio */
+const unsigned int gappx = 10;       /* gap pixel */
+float splitrat = 0.6;     /* split ratio */
 
 #define SAVE_SCREENSHOT "tee $HOME/Pictures/Screenshots/$(date +'Screenshot-from-%Y-%m-%d-%H-%M-%S').png | xclip -selection clipboard -t image/png"
 

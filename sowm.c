@@ -118,7 +118,6 @@ void win_add(Window w) {
         c->prev          = list->prev;
         list->prev       = c;
         c->next          = list;
-
     } else {
         list = c;
         list->prev = list->next = list;
@@ -126,6 +125,7 @@ void win_add(Window w) {
 
     ws_save(ws);
     win_focus(c);
+    win_center((const Arg){0});
 }
 
 void win_del(Window w) {
