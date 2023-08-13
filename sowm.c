@@ -12,7 +12,7 @@
 #include "config.h"
 
 static client       *list = {0}, *ws_list[WORKSPACE_COUNT] = {0}, *cur;
-static int          ws = 1, sw, sh, wx, wy, numlock = 0;
+static int          ws = 0, sw, sh, wx, wy, numlock = 0;
 static unsigned int ww, wh;
 
 static bool keep_running = true;
