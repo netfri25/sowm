@@ -195,24 +195,24 @@ void win_snap(const Arg arg) {
             x = wx;
             y = wy;
             w = ww;
-            h = (splitrat * wh) - (gappx / 2);
+            h = (splitrat * wh) - (gappx / 2.f);
             break;
         case 2:
-            x = wx + (splitrat * ww) + (gappx / 2);
+            x = wx + (splitrat * ww) + (gappx / 2.f);
             y = wy;
-            w = ((1 - splitrat) * ww) - (gappx / 2);
+            w = ((1 - splitrat) * ww) - (gappx / 2.f);
             h = wh;
             break;
         case 3:
             x = wx;
-            y = wy + (splitrat * wh) + (gappx / 2);
+            y = wy + (splitrat * wh) + (gappx / 2.f);
             w = ww;
-            h = ((1 - splitrat) * wh) - (gappx / 2);
+            h = ((1 - splitrat) * wh) - (gappx / 2.f);
             break;
         case 4:
             x = wx;
             y = wy;
-            w = (splitrat * ww) - (gappx / 2);
+            w = (splitrat * ww) - (gappx / 2.f);
             h = wh;
             break;
         default:
