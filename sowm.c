@@ -288,14 +288,14 @@ void ws_go(const Arg arg) {
 static int prev_workspace(void) {
     int new_ws = ws - 1;
     // wrap around
-    if (new_ws <= 0) new_ws = WORKSPACE_COUNT - 1;
+    if (new_ws < 0) new_ws = WORKSPACE_COUNT - 1;
     return new_ws;
 }
 
 static int next_workspace(void) {
     int new_ws = ws + 1;
     // wrap around
-    if (new_ws >= WORKSPACE_COUNT) new_ws = 1;
+    if (new_ws >= WORKSPACE_COUNT) new_ws = 0;
     return new_ws;
 }
 

@@ -10,7 +10,7 @@
 
 #define MOD Mod4Mask
 
-#define WORKSPACE_COUNT 10
+#define WORKSPACE_COUNT 4
 #define CENTER_FIX 3
 
 #define BORDER_WIDTH 3
@@ -99,23 +99,17 @@ struct key keys[] = {
     {MOD, XK_d, ws_next, {0}},
     {MOD|ShiftMask, XK_d, win_to_next_ws, {0}},
 
-    {MOD,           XK_1, ws_go,     {.i = 1}},
-    {MOD|ShiftMask, XK_1, win_to_ws, {.i = 1}},
+    {MOD,           XK_1, ws_go,     {.i = 0}},
+    {MOD|ShiftMask, XK_1, win_to_ws, {.i = 0}},
 
-    {MOD,           XK_2, ws_go,     {.i = 2}},
-    {MOD|ShiftMask, XK_2, win_to_ws, {.i = 2}},
+    {MOD,           XK_2, ws_go,     {.i = 1}},
+    {MOD|ShiftMask, XK_2, win_to_ws, {.i = 1}},
 
-    {MOD,           XK_3, ws_go,     {.i = 3}},
-    {MOD|ShiftMask, XK_3, win_to_ws, {.i = 3}},
+    {MOD,           XK_3, ws_go,     {.i = 2}},
+    {MOD|ShiftMask, XK_3, win_to_ws, {.i = 2}},
 
-    {MOD,           XK_4, ws_go,     {.i = 4}},
-    {MOD|ShiftMask, XK_4, win_to_ws, {.i = 4}},
-
-    {MOD,           XK_5, ws_go,     {.i = 5}},
-    {MOD|ShiftMask, XK_5, win_to_ws, {.i = 5}},
-
-    {MOD,           XK_6, ws_go,     {.i = 6}},
-    {MOD|ShiftMask, XK_6, win_to_ws, {.i = 6}},
+    {MOD,           XK_4, ws_go,     {.i = 3}},
+    {MOD|ShiftMask, XK_4, win_to_ws, {.i = 3}},
 };
 
 #endif
