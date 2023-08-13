@@ -300,24 +300,20 @@ static int next_workspace(void) {
 }
 
 void ws_prev(const Arg arg) {
-    (void) arg;
     ws_go((const Arg){.i = prev_workspace()});
 }
 
 void ws_next(const Arg arg) {
-    (void) arg;
     ws_go((const Arg){.i = next_workspace()});
 }
 
 void win_to_prev_ws(const Arg arg) {
-    (void) arg;
     const Arg new_ws = {.i = prev_workspace()};
     win_to_ws(new_ws);
     ws_go(new_ws);
 }
 
 void win_to_next_ws(const Arg arg) {
-    (void) arg;
     const Arg new_ws = {.i = next_workspace()};
     win_to_ws(new_ws);
     ws_go(new_ws);
@@ -404,7 +400,6 @@ void input_grab(Window root) {
 }
 
 void stop_running(const Arg arg) {
-    (void) arg;
     keep_running = false;
 }
 
